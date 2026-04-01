@@ -390,6 +390,7 @@ body::before {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .voice-card {
@@ -477,7 +478,7 @@ body::before {
 /* ── Network diagram ── */
 .network-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
   margin: 2rem 0;
 }
@@ -559,7 +560,7 @@ body::before {
 <section class="hero">
   <div class="badge"><span class="dot"></span> Running 24/7 on M4 Mac Mini</div>
   <h1>An <em>AI brain</em> for the house</h1>
-  <p class="subtitle">A homelab that watches 13 cameras, tracks 917 devices across 17 rooms, learns behavioral patterns, and makes decisions — all powered by Claude and running on a single Mac Mini.</p>
+  <p class="subtitle">A homelab that watches 13 cameras, tracks 917 devices across 17 rooms, learns behavioral patterns, and makes decisions — powered by Claude and running on two Mac Minis with battery-backed redundant power.</p>
 
   <div class="hero-stats">
     <div class="hero-stat"><div class="num">917</div><div class="label">Devices Tracked</div></div>
@@ -624,9 +625,9 @@ body::before {
 
 <!-- ═══════════ AI BRAIN ═══════════ -->
 <section class="section reveal">
-  <div class="section-label">02 — The AI Brain</div>
+  <div class="section-label">02 — The Neural Brain</div>
   <h2>Claude thinks about your home <em>every 5 minutes</em></h2>
-  <p class="desc">A continuous daemon powered by Claude Sonnet and local Ollama models analyzes sensor patterns, camera feeds, and historical baselines to detect anomalies, predict behavior, and suggest automations.</p>
+  <p class="desc">A neural brain powered by Claude Sonnet and local Ollama models uses machine learning to control devices based on its training. It analyzes sensor patterns, camera feeds, and 30-day behavioral baselines to detect anomalies, predict what should happen next, and act on it.</p>
 
   <div class="brain-grid">
     <div class="brain-card">
@@ -643,8 +644,8 @@ body::before {
     </div>
     <div class="brain-card">
       <div class="card-icon">🎯</div>
-      <h3>Risk-Tiered Actions</h3>
-      <p>Low risk (lights): auto-execute. Medium (covers, climate): Phase 2+. High (locks, alarms): always manual. Every action logged with reasoning.</p>
+      <h3>Learns & Adapts</h3>
+      <p>The brain trains on your family's patterns — when you wake, when lights go on, when doors lock. It builds per-device, per-hour, per-day-of-week models and uses them to control your home automatically.</p>
       <div class="metric" style="color: var(--green);">627 decisions logged</div>
     </div>
     <div class="brain-card">
@@ -704,6 +705,12 @@ body::before {
       <div class="node-sub">Primary hub — all services</div>
     </div>
     <div class="net-node">
+      <div class="node-icon">🖥️</div>
+      <div class="node-label">M1 Mac Mini</div>
+      <div class="node-ip">192.168.0.167</div>
+      <div class="node-sub">Home server — HA, Scrypted, backups</div>
+    </div>
+    <div class="net-node">
       <div class="node-icon">🏠</div>
       <div class="node-label">Home Assistant</div>
       <div class="node-ip">192.168.0.99</div>
@@ -720,6 +727,14 @@ body::before {
       <div class="node-label">UniFi NVR</div>
       <div class="node-ip">192.168.0.1</div>
       <div class="node-sub">6 cameras — Protect AI</div>
+    </div>
+  </div>
+
+  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-top: 1rem; display: flex; align-items: center; gap: 1.5rem;">
+    <div style="font-size: 2rem;">🔋</div>
+    <div>
+      <div style="font-size: 0.9rem; font-weight: 500; margin-bottom: 0.25rem;">Redundant Power — EcoFlow UPS Battery Backup</div>
+      <div style="font-size: 0.78rem; color: var(--text-dim); line-height: 1.5;">EcoFlow Delta 3 Plus and River 3 provide uninterruptible power to the server and network infrastructure. Both Mac Minis, NVRs, and network switches stay online through outages — cameras and AI never go dark.</div>
     </div>
   </div>
 </section>
@@ -793,25 +808,57 @@ body::before {
 
 <!-- ═══════════ VOICE & ALEXA ═══════════ -->
 <section class="section reveal">
-  <div class="section-label">05 — Voice Control</div>
+  <div class="section-label">05 — Voice & Chat Control</div>
   <h2>Talk to your <em>house</em></h2>
-  <p class="desc">Apple TV automations exposed to Alexa via Nabu Casa Cloud. CEC handles TV power and input switching. One voice command controls the entire entertainment stack.</p>
+  <p class="desc">Natural language commands through Alexa, Jarvis chat, or voice input. Entertainment, security, lighting, blinds, and scenes — all from a single sentence. The AI understands context and maps commands to the right devices.</p>
 
   <div class="voice-grid">
     <div class="voice-card">
-      <div class="trigger">"Alexa, play Disney"</div>
-      <div class="action">Wakes Apple TV → CEC powers Samsung → Disney+ launches automatically</div>
-      <div class="icon-row">🏰</div>
+      <div class="trigger">"Goodnight"</div>
+      <div class="action">Locks the front door, turns off all lights, shuts every blind, arms the system — one word puts the whole house to sleep</div>
+      <div class="icon-row">🌙</div>
     </div>
     <div class="voice-card">
-      <div class="trigger">"Alexa, play Netflix"</div>
-      <div class="action">Same seamless chain — voice to streaming in 8 seconds, zero remotes</div>
+      <div class="trigger">"Lock the front door"</div>
+      <div class="action">Jarvis confirms and engages the smart lock. High-risk action — always verified before execution</div>
+      <div class="icon-row">🔒</div>
+    </div>
+    <div class="voice-card">
+      <div class="trigger">"Turn off all the lights"</div>
+      <div class="action">Every Hue bulb and Lutron switch across all 17 rooms goes dark in one command</div>
+      <div class="icon-row">💡</div>
+    </div>
+    <div class="voice-card">
+      <div class="trigger">"Close the blinds"</div>
+      <div class="action">All 6 SwitchBot motorized blinds in the Den, Dining Room, and Study close simultaneously</div>
+      <div class="icon-row">🪟</div>
+    </div>
+    <div class="voice-card">
+      <div class="trigger">"Evening dim"</div>
+      <div class="action">Turns on only lamps and dims them — overhead lights off, ambient mood lighting throughout the house</div>
+      <div class="icon-row">🕯️</div>
+    </div>
+    <div class="voice-card">
+      <div class="trigger">"Play Disney"</div>
+      <div class="action">Wakes Apple TV → CEC powers Samsung → Disney+ launches automatically — voice to streaming in 8 seconds</div>
+      <div class="icon-row">🏰</div>
+    </div>
+  </div>
+  <div class="voice-grid">
+    <div class="voice-card">
+      <div class="trigger">"Play Netflix"</div>
+      <div class="action">Same seamless chain — full entertainment stack from any Echo in the house to the den TV, zero remotes</div>
       <div class="icon-row">🎬</div>
     </div>
     <div class="voice-card">
-      <div class="trigger">"Alexa, play YouTube"</div>
-      <div class="action">Full entertainment stack from any Echo in the house to the den TV</div>
+      <div class="trigger">"Play YouTube"</div>
+      <div class="action">Voice to YouTube on the big screen — Apple TV CEC handles power, input, and app launch</div>
       <div class="icon-row">▶️</div>
+    </div>
+    <div class="voice-card">
+      <div class="trigger">Automatic: Door opens after dark</div>
+      <div class="action">Front porch lights and string lights turn on automatically when any exterior door opens and it's dark outside</div>
+      <div class="icon-row">✨</div>
     </div>
   </div>
 </section>
@@ -945,6 +992,7 @@ body::before {
 
   <div class="tech-pills">
     <span class="pill">M4 Mac Mini</span>
+    <span class="pill">M1 Mac Mini</span>
     <span class="pill">Python 3</span>
     <span class="pill">PostgreSQL</span>
     <span class="pill">Claude Sonnet 4</span>
@@ -964,6 +1012,7 @@ body::before {
     <span class="pill">Anthropic API</span>
     <span class="pill">Web Speech API</span>
     <span class="pill">Face Recognition</span>
+    <span class="pill">EcoFlow UPS</span>
     <span class="pill">Homebridge</span>
   </div>
 </section>
