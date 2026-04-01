@@ -86,6 +86,27 @@ body::before {
   transform: translateY(0);
 }
 
+/* Cards with icons: fade only, no vertical shift */
+.brain-card.r,
+.voice-card.r,
+.sensor-tile.r,
+.net-node.r,
+.ups-banner.r,
+.features-grid.r,
+.db-grid.r {
+  transform: none;
+}
+
+.brain-card.r.show,
+.voice-card.r.show,
+.sensor-tile.r.show,
+.net-node.r.show,
+.ups-banner.r.show,
+.features-grid.r.show,
+.db-grid.r.show {
+  transform: none;
+}
+
 /* ── Shimmer on first appear ── */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
