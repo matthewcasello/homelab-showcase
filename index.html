@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casello Homelab — AI-Powered Smart Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0c;
+  --surface: #111114;
+  --surface-2: #19191e;
+  --border: #222228;
+  --text: #e8e6e3;
+  --text-dim: #8a8a95;
+  --accent: #4f8fff;
+  --accent-glow: rgba(79, 143, 255, 0.15);
+  --green: #34d399;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --purple: #a78bfa;
+  --cyan: #22d3ee;
+  --pink: #f472b6;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, rgba(79,143,255,0.06) 0%, rgba(167,139,250,0.03) 40%, transparent 70%);
+  pointer-events: none;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards;
+}
+
+.badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.hero h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  max-width: 900px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.15s forwards;
+}
+
+.hero h1 em { font-style: italic; color: var(--accent); }
+
+.hero .subtitle {
+  font-size: 1.15rem;
+  color: var(--text-dim);
+  max-width: 580px;
+  line-height: 1.6;
+  margin-top: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2rem;
+  margin-top: 3.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.45s forwards;
+}
+
+.hero-stat { text-align: center; }
+.hero-stat .num {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.2rem;
+  color: var(--text);
+}
+.hero-stat .label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-top: 0.2rem;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-dim);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.6s forwards;
+}
+
+.scroll-hint .arrow {
+  width: 1px; height: 30px;
+  background: linear-gradient(to bottom, var(--text-dim), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* ── Sections ── */
+.section {
+  padding: 6rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.section h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.section h2 em { font-style: italic; color: var(--accent); }
+
+.section .desc {
+  color: var(--text-dim);
+  line-height: 1.6;
+  max-width: 620px;
+  margin-bottom: 3rem;
+  font-size: 0.95rem;
+}
+
+/* ── Divider ── */
+.divider {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.divider hr {
+  border: none;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Database Backbone ── */
+.db-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+
+.db-cell {
+  background: var(--surface);
+  padding: 1.25rem;
+  transition: background 0.3s;
+}
+.db-cell:hover { background: var(--surface-2); }
+
+.db-cell .count {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.6rem;
+  margin-bottom: 0.2rem;
+}
+.db-cell .tname {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.db-cell.highlight .count { color: var(--accent); }
+.db-cell.green .count { color: var(--green); }
+.db-cell.purple .count { color: var(--purple); }
+.db-cell.amber .count { color: var(--amber); }
+.db-cell.cyan .count { color: var(--cyan); }
+.db-cell.pink .count { color: var(--pink); }
+
+/* ── Pipeline ── */
+.pipeline {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 2.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pipe-stage {
+  flex: 1;
+  padding: 1.5rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: relative;
+  transition: background 0.3s;
+}
+.pipe-stage:last-child { border-right: none; }
+.pipe-stage:hover { background: var(--surface-2); }
+
+.pipe-stage::after {
+  content: '→';
+  position: absolute;
+  right: -0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  z-index: 1;
+}
+.pipe-stage:last-child::after { display: none; }
+
+.pipe-stage .stage-icon { font-size: 1.4rem; margin-bottom: 0.5rem; }
+.pipe-stage .stage-title { font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem; }
+.pipe-stage .stage-sub { font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; }
+
+/* ── Brain diagram ── */
+.brain-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.brain-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.brain-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+.brain-card .card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.brain-card h3 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.brain-card p {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.brain-card .metric {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.3rem;
+}
+
+/* ── Sensor tiles ── */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sensor-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.sensor-tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+.sensor-tile .icon { font-size: 1.6rem; margin-bottom: 0.6rem; display: block; }
+.sensor-tile .name { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 0.4rem; }
+.sensor-tile .value { font-family: 'Instrument Serif', serif; font-size: 1.4rem; }
+.sensor-tile .camera { font-size: 0.6rem; color: var(--text-dim); margin-top: 0.4rem; }
+
+.sensor-tile.active .value { color: var(--green); }
+.sensor-tile.info .value { color: var(--accent); }
+.sensor-tile.warning .value { color: var(--amber); }
+
+/* ── Feature grid ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.feature-card {
+  background: var(--surface);
+  padding: 2rem;
+  transition: background 0.3s;
+}
+.feature-card:hover { background: var(--surface-2); }
+
+.feature-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+.feature-card h3 { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.4rem; }
+.feature-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.55; }
+.feature-card .tag {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+/* ── Voice cards ── */
+.voice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.voice-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.voice-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.voice-card:nth-child(1)::before { background: linear-gradient(90deg, #1a73e8, #4f8fff); }
+.voice-card:nth-child(2)::before { background: linear-gradient(90deg, #e50914, #ff4444); }
+.voice-card:nth-child(3)::before { background: linear-gradient(90deg, #ff0000, #ff6644); }
+
+.voice-card .trigger {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  margin-bottom: 0.6rem;
+}
+.voice-card .action {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.voice-card .icon-row { margin-top: 0.75rem; font-size: 1.4rem; }
+
+/* ── Device registry ── */
+.device-bar {
+  display: flex;
+  height: 28px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1.5rem 0 1rem;
+  gap: 2px;
+}
+.device-bar .segment {
+  transition: flex 0.5s ease;
+  position: relative;
+  min-width: 2px;
+}
+.device-bar .segment:hover { opacity: 0.85; }
+
+.device-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 2rem;
+}
+.device-legend .item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+.device-legend .swatch {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+}
+
+/* ── Tech pills ── */
+.tech-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.pill {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  transition: all 0.3s;
+}
+.pill:hover { border-color: var(--accent); color: var(--text); }
+
+/* ── Network diagram ── */
+.network-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.net-node {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+.net-node:hover { border-color: var(--accent); }
+.net-node .node-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
+.net-node .node-label { font-size: 0.78rem; font-weight: 500; }
+.net-node .node-ip { font-size: 0.6rem; color: var(--text-dim); margin-top: 0.2rem; font-family: monospace; }
+.net-node .node-sub { font-size: 0.6rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+/* ── Footer ── */
+.footer {
+  text-align: center;
+  padding: 5rem 2rem 3rem;
+  border-top: 1px solid var(--border);
+  position: relative;
+}
+.footer::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(circle, rgba(79,143,255,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.footer h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.2rem;
+  font-weight: 400;
+  margin-bottom: 0.75rem;
+}
+.footer p { color: var(--text-dim); font-size: 0.85rem; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+.footer .collab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 0.6rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ── Animations ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes scrollPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+
+@media (max-width: 768px) {
+  .hero-stats { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .sensor-grid { grid-template-columns: repeat(2, 1fr); }
+  .sensor-grid .sensor-tile:last-child { grid-column: span 2; }
+  .voice-grid { grid-template-columns: 1fr; }
+  .brain-grid { grid-template-columns: 1fr; }
+  .db-grid { grid-template-columns: repeat(2, 1fr); }
+  .pipeline { flex-direction: column; }
+  .pipe-stage::after { display: none; }
+  .network-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero">
+  <div class="badge"><span class="dot"></span> Running 24/7 on M4 Mac Mini</div>
+  <h1>An <em>AI brain</em> for the house</h1>
+  <p class="subtitle">A homelab that watches 13 cameras, tracks 917 devices across 17 rooms, learns behavioral patterns, and makes decisions — all powered by Claude and running on a single Mac Mini.</p>
+
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">917</div><div class="label">Devices Tracked</div></div>
+    <div class="hero-stat"><div class="num">51.8K</div><div class="label">Events Logged</div></div>
+    <div class="hero-stat"><div class="num">13</div><div class="label">Camera Feeds</div></div>
+    <div class="hero-stat"><div class="num">17</div><div class="label">Rooms Mapped</div></div>
+    <div class="hero-stat"><div class="num">28</div><div class="label">Integrations</div></div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll to explore</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════ DATA BACKBONE ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">01 — The Data Backbone</div>
+  <h2>PostgreSQL is the <em>nervous system</em></h2>
+  <p class="desc">Every state change, camera detection, AI decision, and conversation is captured in a structured database — the foundation for pattern learning, anomaly detection, and automated actions.</p>
+
+  <div class="db-grid">
+    <div class="db-cell highlight"><div class="count">51,858</div><div class="tname">device_events</div></div>
+    <div class="db-cell green"><div class="count">1,610</div><div class="tname">vision_events</div></div>
+    <div class="db-cell purple"><div class="count">2,309</div><div class="tname">camera_events</div></div>
+    <div class="db-cell cyan"><div class="count">627</div><div class="tname">control_log</div></div>
+    <div class="db-cell amber"><div class="count">448</div><div class="tname">brain_log</div></div>
+    <div class="db-cell pink"><div class="count">329</div><div class="tname">brain_baselines</div></div>
+    <div class="db-cell"><div class="count">194</div><div class="tname">chat_messages</div></div>
+    <div class="db-cell"><div class="count">460</div><div class="tname">notification_log</div></div>
+    <div class="db-cell green"><div class="count">43</div><div class="tname">identified_events</div></div>
+    <div class="db-cell"><div class="count">123</div><div class="tname">weather_snapshots</div></div>
+    <div class="db-cell"><div class="count">10</div><div class="tname">face_encodings</div></div>
+    <div class="db-cell purple"><div class="count">135</div><div class="tname">sensor_analysis_log</div></div>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipe-stage">
+      <div class="stage-icon">📡</div>
+      <div class="stage-title">Ingest</div>
+      <div class="stage-sub">HA WebSocket + Homebridge poll every state change across 917 entities into device_events</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="stage-icon">👁️</div>
+      <div class="stage-title">Detect</div>
+      <div class="stage-sub">YOLO v8 on MPS + UniFi Protect native AI → vision_events + camera_events</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="stage-icon">🧠</div>
+      <div class="stage-title">Reason</div>
+      <div class="stage-sub">Claude brain runs anomaly detection every 15 min, builds baselines at 2 AM, generates hunches every 5 min</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="stage-icon">⚡</div>
+      <div class="stage-title">Act</div>
+      <div class="stage-sub">Suggestions → control_log. Auto-executes low-risk actions. High-risk requires human confirmation.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════ AI BRAIN ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">02 — The AI Brain</div>
+  <h2>Claude thinks about your home <em>every 5 minutes</em></h2>
+  <p class="desc">A continuous daemon powered by Claude Sonnet and local Ollama models analyzes sensor patterns, camera feeds, and historical baselines to detect anomalies, predict behavior, and suggest automations.</p>
+
+  <div class="brain-grid">
+    <div class="brain-card">
+      <div class="card-icon">📊</div>
+      <h3>Anomaly Detection</h3>
+      <p>Every 15 minutes, compares current sensor readings against 30-day rolling baselines per camera, per hour, per day-of-week. Flags statistical outliers.</p>
+      <div class="metric" style="color: var(--accent);">448 brain runs</div>
+    </div>
+    <div class="brain-card">
+      <div class="card-icon">💡</div>
+      <h3>Room-Aware Hunches</h3>
+      <p>Every 5 minutes, correlates motion sensors across 17 rooms with time-of-day patterns. "Lights left on in kitchen with no motion for 30 min → suggest turn off."</p>
+      <div class="metric" style="color: var(--purple);">72 auto-executed</div>
+    </div>
+    <div class="brain-card">
+      <div class="card-icon">🎯</div>
+      <h3>Risk-Tiered Actions</h3>
+      <p>Low risk (lights): auto-execute. Medium (covers, climate): Phase 2+. High (locks, alarms): always manual. Every action logged with reasoning.</p>
+      <div class="metric" style="color: var(--green);">627 decisions logged</div>
+    </div>
+    <div class="brain-card">
+      <div class="card-icon">👤</div>
+      <h3>Person Recognition</h3>
+      <p>Face encodings + Claude vision identify family members at cameras. Triggers person-specific automations — arrival lighting, notifications, visit tracking.</p>
+      <div class="metric" style="color: var(--cyan);">43 identifications</div>
+    </div>
+    <div class="brain-card">
+      <div class="card-icon">🗣️</div>
+      <h3>Jarvis Chat</h3>
+      <p>Natural language home control via dashboard. Routes to local Ollama qwen3:8b (fast) with Claude Sonnet fallback. Understands room aliases and entity mapping.</p>
+      <div class="metric" style="color: var(--amber);">194 messages</div>
+    </div>
+    <div class="brain-card">
+      <div class="card-icon">📅</div>
+      <h3>Weekly Digest</h3>
+      <p>Every Sunday at 8 PM, Claude Sonnet generates a comprehensive summary of the week — unusual events, pattern shifts, recommendations, and a status report.</p>
+      <div class="metric" style="color: var(--pink);">290 notifications</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════ DEVICE REGISTRY ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">03 — Device Intelligence</div>
+  <h2>917 entities across <em>17 rooms</em></h2>
+  <p class="desc">Every sensor, light, switch, camera, lock, climate unit, and media player tracked in real-time. State changes flow through the WebSocket listener and into PostgreSQL for historical analysis.</p>
+
+  <div class="device-bar">
+    <div class="segment" style="flex: 301; background: var(--accent);" title="Sensors: 301"></div>
+    <div class="segment" style="flex: 134; background: var(--green);" title="Binary Sensors: 134"></div>
+    <div class="segment" style="flex: 124; background: var(--purple);" title="Switches: 124"></div>
+    <div class="segment" style="flex: 52; background: var(--amber);" title="Lights: 52"></div>
+    <div class="segment" style="flex: 35; background: var(--cyan);" title="Selects: 35"></div>
+    <div class="segment" style="flex: 28; background: var(--pink);" title="Notify: 28"></div>
+    <div class="segment" style="flex: 143; background: var(--text-dim); opacity: 0.3;" title="Other: 143"></div>
+  </div>
+
+  <div class="device-legend">
+    <div class="item"><div class="swatch" style="background: var(--accent);"></div> Sensors (301)</div>
+    <div class="item"><div class="swatch" style="background: var(--green);"></div> Binary Sensors (134)</div>
+    <div class="item"><div class="swatch" style="background: var(--purple);"></div> Switches (124)</div>
+    <div class="item"><div class="swatch" style="background: var(--amber);"></div> Lights (52)</div>
+    <div class="item"><div class="swatch" style="background: var(--cyan);"></div> Selects (35)</div>
+    <div class="item"><div class="swatch" style="background: var(--pink);"></div> Notify (28)</div>
+    <div class="item"><div class="swatch" style="background: var(--text-dim); opacity: 0.3;"></div> Other (143)</div>
+  </div>
+
+  <div class="network-grid">
+    <div class="net-node">
+      <div class="node-icon">🖥️</div>
+      <div class="node-label">M4 Mac Mini</div>
+      <div class="node-ip">192.168.0.139</div>
+      <div class="node-sub">Primary hub — all services</div>
+    </div>
+    <div class="net-node">
+      <div class="node-icon">🏠</div>
+      <div class="node-label">Home Assistant</div>
+      <div class="node-ip">192.168.0.99</div>
+      <div class="node-sub">Smart home platform</div>
+    </div>
+    <div class="net-node">
+      <div class="node-icon">📹</div>
+      <div class="node-label">LTS Pro NVR</div>
+      <div class="node-ip">192.168.0.114</div>
+      <div class="node-sub">7 cameras — RTSP</div>
+    </div>
+    <div class="net-node">
+      <div class="node-icon">🛡️</div>
+      <div class="node-label">UniFi NVR</div>
+      <div class="node-ip">192.168.0.1</div>
+      <div class="node-sub">6 cameras — Protect AI</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════ CAMERA SENSORS ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">04 — Camera Intelligence</div>
+  <h2>AI eyes that <em>understand</em> what they see</h2>
+  <p class="desc">A Python daemon analyzes live camera frames via Claude Haiku every 2 hours — or instantly on motion — and creates real Home Assistant sensors. No dedicated hardware sensors needed.</p>
+
+  <div class="sensor-grid">
+    <div class="sensor-tile warning">
+      <span class="icon">🗑️</span>
+      <div class="name">Trash Cans</div>
+      <div class="value">At Curb</div>
+      <div class="camera">G5 Flex Driveway</div>
+    </div>
+    <div class="sensor-tile info">
+      <span class="icon">🚗</span>
+      <div class="name">Cars Home</div>
+      <div class="value">2</div>
+      <div class="camera">G5 Flex Driveway</div>
+    </div>
+    <div class="sensor-tile active">
+      <span class="icon">📦</span>
+      <div class="name">Package</div>
+      <div class="value">None</div>
+      <div class="camera">LTS Front Door</div>
+    </div>
+    <div class="sensor-tile active">
+      <span class="icon">🏊</span>
+      <div class="name">Pool</div>
+      <div class="value">Covered</div>
+      <div class="camera">LTS Pool Cam</div>
+    </div>
+    <div class="sensor-tile active">
+      <span class="icon">🚪</span>
+      <div class="name">Garage</div>
+      <div class="value">Closed</div>
+      <div class="camera">G3 Garage</div>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipe-stage">
+      <div class="stage-icon">📹</div>
+      <div class="stage-title">Camera Frame</div>
+      <div class="stage-sub">RTSP stream or HA camera proxy snapshot</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="stage-icon">🧠</div>
+      <div class="stage-title">Claude Haiku</div>
+      <div class="stage-sub">Vision analysis → structured JSON</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="stage-icon">🏠</div>
+      <div class="stage-title">HA Sensor</div>
+      <div class="stage-sub">POST /api/states → real entity</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="stage-icon">📱</div>
+      <div class="stage-title">Everywhere</div>
+      <div class="stage-sub">Dashboard + Alexa + Siri</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════ VOICE & ALEXA ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">05 — Voice Control</div>
+  <h2>Talk to your <em>house</em></h2>
+  <p class="desc">Apple TV automations exposed to Alexa via Nabu Casa Cloud. CEC handles TV power and input switching. One voice command controls the entire entertainment stack.</p>
+
+  <div class="voice-grid">
+    <div class="voice-card">
+      <div class="trigger">"Alexa, play Disney"</div>
+      <div class="action">Wakes Apple TV → CEC powers Samsung → Disney+ launches automatically</div>
+      <div class="icon-row">🏰</div>
+    </div>
+    <div class="voice-card">
+      <div class="trigger">"Alexa, play Netflix"</div>
+      <div class="action">Same seamless chain — voice to streaming in 8 seconds, zero remotes</div>
+      <div class="icon-row">🎬</div>
+    </div>
+    <div class="voice-card">
+      <div class="trigger">"Alexa, play YouTube"</div>
+      <div class="action">Full entertainment stack from any Echo in the house to the den TV</div>
+      <div class="icon-row">▶️</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════ SMART HOME ECOSYSTEM ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">06 — The Connected Home</div>
+  <h2>28 integrations, <em>one brain</em></h2>
+  <p class="desc">Lights, blinds, robots, TVs, speakers, locks, cameras, and sensors from a dozen manufacturers — all unified through Home Assistant and controlled by AI. Jarvis can operate anything by voice or chat.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(79,143,255,0.1); color: var(--accent);">🤖</div>
+      <h3>Roborock S8 MaxV Ultra</h3>
+      <p>AI-powered robot vacuum + mop. Tracks battery, cleaning progress, current room, dock status (water, dirty tank, mop drying), and maintenance schedules for brush, filter, and side brush.</p>
+      <span class="tag">76 total cleans • 5,442 m² cleaned</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(52,211,153,0.1); color: var(--green);">🐱</div>
+      <h3>Litter-Robot 4</h3>
+      <p>Self-cleaning litter box with waste drawer level (22%), litter level (90%), pet weight tracking (13.27 lbs last visit), auto-clean cycles, and a light automation that turns on when cycling.</p>
+      <span class="tag">litterrobot integration</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(167,139,250,0.1); color: var(--purple);">💡</div>
+      <h3>Philips Hue + Lutron Caseta</h3>
+      <p>50 lights across the house — Hue color bulbs, Play bars, gradient lightstrips, and ceiling downlights. Lutron Caseta controls switches and scenes like Goodnight, Movie Time, and Arriving Home.</p>
+      <span class="tag">14 scenes configured</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(251,191,36,0.1); color: var(--amber);">🪟</div>
+      <h3>Motorized Blinds</h3>
+      <p>6 SwitchBot motorized blinds across Den, Dining Room, and Study — all controllable via Jarvis, Alexa, or automations. Open/close/position control with battery monitoring.</p>
+      <span class="tag">switchbot_cloud</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(34,211,238,0.1); color: var(--cyan);">📺</div>
+      <h3>Multi-Room Entertainment</h3>
+      <p>3 Apple TVs (Den, Basement, Bedroom), Samsung QLED, LG TV, Frame TV — all HA-controllable. CEC chains, source switching, and one-tap streaming scripts.</p>
+      <span class="tag">5 media players • 3 remotes</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(244,114,182,0.1); color: var(--pink);">🔊</div>
+      <h3>5 Echo Devices</h3>
+      <p>Echo Show, 2 Echo Dots, Kitchen Echo, Office Echo — with temperature, illuminance, and motion sensors. Can announce, speak TTS, and trigger any HA automation by voice.</p>
+      <span class="tag">alexa + nabu casa cloud</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(248,113,113,0.1); color: var(--red);">🚪</div>
+      <h3>Ring Doorbell</h3>
+      <p>Front door video doorbell with motion detection, ding events, live view, and battery monitoring. Events feed into the camera pipeline for AI analysis and notifications.</p>
+      <span class="tag">ring integration</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(200,200,200,0.08); color: var(--text-dim);">🔌</div>
+      <h3>Smart Plugs + Energy</h3>
+      <p>TP-Link Kasa and Meross smart plugs with energy monitoring — track consumption for basement TV, home theater, studio lights, string lights. PECO utility integration for bill tracking.</p>
+      <span class="tag">opower + tplink + meross</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════ SERVICES ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">07 — Always Running</div>
+  <h2>12 services, <em>zero downtime</em></h2>
+  <p class="desc">Every service runs as a persistent launchd daemon with auto-restart, health monitoring, and centralized logging. The M4 Mac Mini is the brain that never sleeps.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(79,143,255,0.1); color: var(--accent);">🧠</div>
+      <h3>Claude Brain</h3>
+      <p>Anomaly detection (15 min), hunches (5 min), baselines (2 AM), weekly digest (Sun 8 PM). The decision engine.</p>
+      <span class="tag">claude_brain.py</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(52,211,153,0.1); color: var(--green);">📹</div>
+      <h3>Vision Processor</h3>
+      <p>2-second cycle across 13 cameras. YOLO v8 on Apple MPS GPU. Claude Haiku second-pass. Face recognition. Clip recording.</p>
+      <span class="tag">vision_processor.py</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(167,139,250,0.1); color: var(--purple);">📡</div>
+      <h3>HA Listener</h3>
+      <p>WebSocket subscriber to all 917 entity state changes. Routes camera detections. Fires native AI alerts. Never misses an event.</p>
+      <span class="tag">ha_listener.py</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(251,191,36,0.1); color: var(--amber);">⚡</div>
+      <h3>Action Engine</h3>
+      <p>Polls identified_events, fires person-specific automations. Notifies on unknown persons. Risk-gated HA service calls.</p>
+      <span class="tag">action_engine.py</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(34,211,238,0.1); color: var(--cyan);">📸</div>
+      <h3>Camera Sensors</h3>
+      <p>Claude Haiku analyzes 4 cameras for trash, cars, packages, pool, garage. Motion-triggered + 2-hour schedule.</p>
+      <span class="tag">camera_sensor_service.py</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(244,114,182,0.1); color: var(--pink);">🖥️</div>
+      <h3>Camera Dashboard</h3>
+      <p>Custom web server with live camera grid, AI vision feed, activity timeline, who's home tracking, and Jarvis chat.</p>
+      <span class="tag">serve.py @ :8765</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(248,113,113,0.1); color: var(--red);">🏥</div>
+      <h3>Health Monitor</h3>
+      <p>12 service checks every 10 minutes — SSH, HTTP, daemons, DB, event freshness. Daily digest at 8 AM.</p>
+      <span class="tag">health_check.py</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: rgba(200,200,200,0.08); color: var(--text-dim);">👣</div>
+      <h3>Visit Tracker</h3>
+      <p>Groups identified_events into person_visits with arrival/departure inference. Knows who's home and when they left.</p>
+      <span class="tag">visit_tracker.py</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════ TECH STACK ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">08 — Under the Hood</div>
+  <h2>The stack</h2>
+
+  <div class="tech-pills">
+    <span class="pill">M4 Mac Mini</span>
+    <span class="pill">Python 3</span>
+    <span class="pill">PostgreSQL</span>
+    <span class="pill">Claude Sonnet 4</span>
+    <span class="pill">Claude Haiku 4.5</span>
+    <span class="pill">Claude Code (Opus 4.6)</span>
+    <span class="pill">Ollama qwen3:8b</span>
+    <span class="pill">YOLOv8 on MPS</span>
+    <span class="pill">Home Assistant</span>
+    <span class="pill">Nabu Casa Cloud</span>
+    <span class="pill">Alexa Skills</span>
+    <span class="pill">Apple TV CEC</span>
+    <span class="pill">RTSP / Scrypted</span>
+    <span class="pill">LTS Pro NVR</span>
+    <span class="pill">UniFi Protect</span>
+    <span class="pill">launchd Daemons</span>
+    <span class="pill">Mushroom Cards</span>
+    <span class="pill">Anthropic API</span>
+    <span class="pill">Web Speech API</span>
+    <span class="pill">Face Recognition</span>
+    <span class="pill">Homebridge</span>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="footer reveal">
+  <h2>Built with Claude Code</h2>
+  <p>An AI-native smart home — from raw cameras and sensors to a thinking, acting, learning system. Designed and deployed collaboratively in real-time.</p>
+  <div class="collab">
+    <span>Matt Casello</span>
+    <span style="color: var(--text-dim);">×</span>
+    <span>Claude Opus 4.6</span>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
